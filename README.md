@@ -14,8 +14,9 @@ In this assignment you will learn how to use built-in **String** and **Math** me
 4. [Parameters and Return Values](#parameters-and-return-values)
 5. [Assignment](#assignment)
 6. [Scoring Rubric](#scoring-rubric)
-7. [Tips for Success](#tips-for-success)
-8. [FAQ](#faq)
+7. [Converting Strings to Numbers](#converting-strings-to-numbers)
+8. [Tips for Success](#tips-for-success)
+9. [FAQ](#faq)
 
 ---
 
@@ -161,13 +162,33 @@ Examples:
 
 ---
 
+## Converting Strings to Numbers
+
+The `prompt()` function **always returns a string**, even when the user types a number. If you try to do math with a string, you will get unexpected results:
+
+```javascript
+let a = prompt("Enter side a:");  // user types 3 → a is "3" (a string)
+let b = prompt("Enter side b:");  // user types 4 → b is "4" (a string)
+```
+
+Use `parseFloat()` to convert a string to a number:
+
+```javascript
+let a = parseFloat(prompt("Enter side a:"));  // a is 3 (a number)
+let b = parseFloat(prompt("Enter side b:"));  // b is 4 (a number)
+```
+
+`parseFloat()` reads a decimal number from a string. Without it, math operations like `Math.sqrt(a * a + b * b)` will not work correctly. You will need this for the **hypotenuse()** function.
+
+---
+
 ## Tips for Success
 
 1. **Start with titleCase()** — it's the simplest and introduces `.charAt()`, `.toUpperCase()`, `.slice()`, and `.toLowerCase()`
 2. **Test getInitials() with both 2 and 3 word names** — the logic changes based on how many spaces there are
 3. **Use `.indexOf()` with a second argument** to find the second space: `.indexOf(" ", firstSpace + 1)`
 4. **Don't forget the dots** in initials — `"J.D."` not `"JD"`, and include the trailing dot
-5. **Remember parseFloat()** for the hypotenuse — prompt returns strings
+5. **Use `parseFloat()`** for the hypotenuse — `prompt()` returns strings, not numbers (see [Converting Strings to Numbers](#converting-strings-to-numbers) above)
 
 ---
 

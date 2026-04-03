@@ -74,7 +74,7 @@ jobs:
             });
 
             test('uses a String method', function() {
-              expect(source).toMatch(/\.(charAt|toUpperCase|toLowerCase|indexOf|slice|substring|trim)\s*\(/);
+              expect(source).toMatch(/\.(charAt|toUpperCase|toLowerCase|indexOf|slice)\s*\(/);
             });
 
             test('uses Math sqrt', function() {
