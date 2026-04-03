@@ -1,0 +1,229 @@
+name: autograde
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  autograde:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Jest
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install --save-dev jest@29
+
+      - name: Write jest config
+        run: |
+          cat > jest.config.cjs <<'EOF'
+          module.exports = {
+            testEnvironment: 'node',
+            testMatch: ['**/__tests__/**/*.test.cjs']
+          };
+          EOF
+
+      - name: Write tests
+        run: |
+          mkdir -p __tests__
+          cat > __tests__/methods.test.cjs <<'TESTEOF'
+          const fs = require('fs');
+          const path = require('path');
+          const vm = require('vm');
+
+          const source = fs.readFileSync(path.resolve('script.js'), 'utf8');
+
+          function runFunc(funcName, promptValues) {
+            let promptIndex = 0;
+            const alerts = [];
+            const sandbox = {
+              prompt: function(msg) { return promptValues[promptIndex++]; },
+              alert: function(msg) { alerts.push(String(msg)); },
+              console: { log: function(){}, error: function(){}, warn: function(){} },
+              parseInt: parseInt,
+              parseFloat: parseFloat,
+              isNaN: isNaN,
+              NaN: NaN,
+              undefined: undefined,
+              String: String,
+              Number: Number,
+              Math: Math,
+            };
+            vm.createContext(sandbox);
+            vm.runInContext(source, sandbox, { timeout: 5000 });
+            if (typeof sandbox[funcName] === 'function') {
+              sandbox[funcName]();
+            }
+            return alerts;
+          }
+
+          describe('Unit 8.2 – Methods & Returns', function() {
+
+            test('titleCase hELLO to Hello', function() {
+              let alerts = runFunc('titleCase', ['hELLO']);
+              expect(alerts.length).toBeGreaterThanOrEqual(1);
+              expect(alerts[0]).toBe('Hello');
+            });
+
+            test('uses a String method', function() {
+              expect(source).toMatch(/\.(charAt|toUpperCase|toLowerCase|indexOf|slice|substring|trim)\s*\(/);
+            });
+
+            test('uses Math sqrt', function() {
+              expect(source).toMatch(/Math\.sqrt\s*\(/);
+            });
+
+            test('getInitials two word name', function() {
+              let alerts = runFunc('getInitials', ['John Doe']);
+              expect(alerts.length).toBeGreaterThanOrEqual(1);
+              expect(alerts[0]).toBe('J.D.');
+            });
+
+            test('getInitials three word name', function() {
+              let alerts = runFunc('getInitials', ['Mary Jane Watson']);
+              expect(alerts.length).toBeGreaterThanOrEqual(1);
+              expect(alerts[0]).toBe('M.J.W.');
+            });
+
+            test('hypotenuse 3 4 gives 5', function() {
+              let alerts = runFunc('hypotenuse', ['3', '4']);
+              expect(alerts.length).toBeGreaterThanOrEqual(1);
+              expect(alerts[0]).toBe('Hypotenuse: 5.00');
+            });
+
+            test('hypotenuse 5 12 gives 13', function() {
+              let alerts = runFunc('hypotenuse', ['5', '12']);
+              expect(alerts.length).toBeGreaterThanOrEqual(1);
+              expect(alerts[0]).toBe('Hypotenuse: 13.00');
+            });
+
+          });
+          TESTEOF
+
+      # === Graded steps (sum to 100) ===
+      - id: t_title
+        name: titleCase hELLO to Hello
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: titleCase hELLO to Hello
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "titleCase hELLO to Hello$"
+          timeout: 60
+          max-score: 15
+
+      - id: t_string_method
+        name: uses a String method
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: uses a String method
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "uses a String method$"
+          timeout: 60
+          max-score: 10
+
+      - id: t_sqrt
+        name: uses Math sqrt
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: uses Math sqrt
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "uses Math sqrt$"
+          timeout: 60
+          max-score: 5
+
+      - id: t_initials2
+        name: getInitials two word name
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: getInitials two word name
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "getInitials two word name$"
+          timeout: 60
+          max-score: 20
+
+      - id: t_initials3
+        name: getInitials three word name
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: getInitials three word name
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "getInitials three word name$"
+          timeout: 60
+          max-score: 20
+
+      - id: t_hyp34
+        name: hypotenuse 3 4 gives 5
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: hypotenuse 3 4 gives 5
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "hypotenuse 3 4 gives 5$"
+          timeout: 60
+          max-score: 15
+
+      - id: t_hyp512
+        name: hypotenuse 5 12 gives 13
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: hypotenuse 5 12 gives 13
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "hypotenuse 5 12 gives 13$"
+          timeout: 60
+          max-score: 15
+
+      # Summary
+      - name: Build summary
+        shell: bash
+        run: |
+          npx jest --runInBand --json --outputFile=jest-summary.json || true
+          node - <<'NODE'
+          const fs = require("fs");
+          let jr = {};
+          try { jr = JSON.parse(fs.readFileSync("jest-summary.json","utf8")); } catch {}
+          const assertions = (jr.testResults||[]).flatMap(t => t.assertionResults || []);
+          const tests = [
+            { name: "titleCase hELLO to Hello", pts: 15 },
+            { name: "uses a String method", pts: 10 },
+            { name: "uses Math sqrt", pts: 5 },
+            { name: "getInitials two word name", pts: 20 },
+            { name: "getInitials three word name", pts: 20 },
+            { name: "hypotenuse 3 4 gives 5", pts: 15 },
+            { name: "hypotenuse 5 12 gives 13", pts: 15 },
+          ];
+          let earned = 0;
+          const lines = ["# Unit 8.2 Autograder Summary", ""];
+          for (const t of tests) {
+            const a = assertions.find(x => x.title === t.name);
+            const passed = !!a && a.status === "passed";
+            if (passed) earned += t.pts;
+            lines.push((passed ? "✅" : "❌") + " " + t.name + " (" + t.pts + " pts)");
+          }
+          lines.push("", "**Score: " + earned + "/100**");
+          console.log(lines.join("\n"));
+          if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+          NODE
+
+      - name: Prepare reporter env
+        shell: bash
+        run: |
+          echo "T_TITLE_RESULTS=${{ steps.t_title.outputs.result }}"               >> "$GITHUB_ENV"
+          echo "T_STRING_METHOD_RESULTS=${{ steps.t_string_method.outputs.result }}" >> "$GITHUB_ENV"
+          echo "T_SQRT_RESULTS=${{ steps.t_sqrt.outputs.result }}"                 >> "$GITHUB_ENV"
+          echo "T_INITIALS2_RESULTS=${{ steps.t_initials2.outputs.result }}"         >> "$GITHUB_ENV"
+          echo "T_INITIALS3_RESULTS=${{ steps.t_initials3.outputs.result }}"         >> "$GITHUB_ENV"
+          echo "T_HYP34_RESULTS=${{ steps.t_hyp34.outputs.result }}"               >> "$GITHUB_ENV"
+          echo "T_HYP512_RESULTS=${{ steps.t_hyp512.outputs.result }}"             >> "$GITHUB_ENV"
+
+      - name: Report grades
+        uses: classroom-resources/autograding-grading-reporter@v1
+        with:
+          runners: 't_title,t_string_method,t_sqrt,t_initials2,t_initials3,t_hyp34,t_hyp512'
+          token: ${{ github.token }}
