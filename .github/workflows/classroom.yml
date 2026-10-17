@@ -111,7 +111,7 @@ jobs:
       # === Graded steps (sum to 100) ===
       - id: t_title
         name: titleCase hELLO to Hello
-        uses: classroom-resources/autograding-command-grader@v1
+        uses: cs-plus-plus/autograding-command-grader@v1
         with:
           test-name: titleCase hELLO to Hello
           setup-command: echo "ready"
@@ -121,7 +121,7 @@ jobs:
 
       - id: t_string_method
         name: uses a String method
-        uses: classroom-resources/autograding-command-grader@v1
+        uses: cs-plus-plus/autograding-command-grader@v1
         with:
           test-name: uses a String method
           setup-command: echo "ready"
@@ -131,7 +131,7 @@ jobs:
 
       - id: t_sqrt
         name: uses Math sqrt
-        uses: classroom-resources/autograding-command-grader@v1
+        uses: cs-plus-plus/autograding-command-grader@v1
         with:
           test-name: uses Math sqrt
           setup-command: echo "ready"
@@ -141,7 +141,7 @@ jobs:
 
       - id: t_initials2
         name: getInitials two word name
-        uses: classroom-resources/autograding-command-grader@v1
+        uses: cs-plus-plus/autograding-command-grader@v1
         with:
           test-name: getInitials two word name
           setup-command: echo "ready"
@@ -151,7 +151,7 @@ jobs:
 
       - id: t_initials3
         name: getInitials three word name
-        uses: classroom-resources/autograding-command-grader@v1
+        uses: cs-plus-plus/autograding-command-grader@v1
         with:
           test-name: getInitials three word name
           setup-command: echo "ready"
@@ -161,7 +161,7 @@ jobs:
 
       - id: t_hyp34
         name: hypotenuse 3 4 gives 5
-        uses: classroom-resources/autograding-command-grader@v1
+        uses: cs-plus-plus/autograding-command-grader@v1
         with:
           test-name: hypotenuse 3 4 gives 5
           setup-command: echo "ready"
@@ -171,7 +171,7 @@ jobs:
 
       - id: t_hyp512
         name: hypotenuse 5 12 gives 13
-        uses: classroom-resources/autograding-command-grader@v1
+        uses: cs-plus-plus/autograding-command-grader@v1
         with:
           test-name: hypotenuse 5 12 gives 13
           setup-command: echo "ready"
@@ -223,7 +223,7 @@ jobs:
           echo "T_HYP512_RESULTS=${{ steps.t_hyp512.outputs.result }}"             >> "$GITHUB_ENV"
 
       - name: Report grades
-        uses: classroom-resources/autograding-grading-reporter@v1
+        uses: cs-plus-plus/autograding-grading-reporter@v1
         with:
           runners: 't_title,t_string_method,t_sqrt,t_initials2,t_initials3,t_hyp34,t_hyp512'
           token: ${{ github.token }}
