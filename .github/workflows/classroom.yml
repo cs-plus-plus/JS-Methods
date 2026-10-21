@@ -41,6 +41,16 @@ jobs:
 
           const source = fs.readFileSync(path.resolve('script.js'), 'utf8');
 
+          // script.js with its comment lines removed. The STEP comments already
+          // say ".charAt(0)" and "Math.sqrt(", so a check of the whole file would
+          // pass on untouched starter code.
+          function codeLines() {
+            return source.split('\n')
+              .map(function(line) { return line.trim(); })
+              .filter(function(line) { return !line.startsWith('//') && !line.startsWith('*'); })
+              .join('\n');
+          }
+
           function runFunc(funcName, promptValues) {
             let promptIndex = 0;
             const alerts = [];
@@ -74,11 +84,7 @@ jobs:
             });
 
             test('uses a String method', function() {
-              expect(source).toMatch(/\.(charAt|toUpperCase|toLowerCase|indexOf|slice)\s*\(/);
-            });
-
-            test('uses Math sqrt', function() {
-              expect(source).toMatch(/Math\.sqrt\s*\(/);
+              expect(codeLines()).toMatch(/\.(charAt|toUpperCase|toLowerCase|indexOf|substring)\s*\(/);
             });
 
             test('getInitials two word name', function() {
@@ -87,10 +93,10 @@ jobs:
               expect(alerts[0]).toBe('J.D.');
             });
 
-            test('getInitials three word name', function() {
-              let alerts = runFunc('getInitials', ['Mary Jane Watson']);
+            test('getInitials lowercase name', function() {
+              let alerts = runFunc('getInitials', ['ada lovelace']);
               expect(alerts.length).toBeGreaterThanOrEqual(1);
-              expect(alerts[0]).toBe('M.J.W.');
+              expect(alerts[0]).toBe('A.L.');
             });
 
             test('hypotenuse 3 4 gives 5', function() {
@@ -103,6 +109,22 @@ jobs:
               let alerts = runFunc('hypotenuse', ['5', '12']);
               expect(alerts.length).toBeGreaterThanOrEqual(1);
               expect(alerts[0]).toBe('Hypotenuse: 13.00');
+            });
+
+            test('uses Math sqrt', function() {
+              expect(codeLines()).toMatch(/Math\.sqrt\s*\(/);
+            });
+
+            test('distance 0 0 to 3 4 gives 5', function() {
+              let alerts = runFunc('distance', ['0', '0', '3', '4']);
+              expect(alerts.length).toBeGreaterThanOrEqual(1);
+              expect(alerts[0]).toBe('Distance: 5.00');
+            });
+
+            test('distance 2 -1 to -4 7 gives 10', function() {
+              let alerts = runFunc('distance', ['2', '-1', '-4', '7']);
+              expect(alerts.length).toBeGreaterThanOrEqual(1);
+              expect(alerts[0]).toBe('Distance: 10.00');
             });
 
           });
@@ -129,6 +151,46 @@ jobs:
           timeout: 60
           max-score: 10
 
+      - id: t_initials2
+        name: getInitials two word name
+        uses: cs-plus-plus/autograding-command-grader@v1
+        with:
+          test-name: getInitials two word name
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "getInitials two word name$"
+          timeout: 60
+          max-score: 15
+
+      - id: t_initials_lower
+        name: getInitials lowercase name
+        uses: cs-plus-plus/autograding-command-grader@v1
+        with:
+          test-name: getInitials lowercase name
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "getInitials lowercase name$"
+          timeout: 60
+          max-score: 10
+
+      - id: t_hyp34
+        name: hypotenuse 3 4 gives 5
+        uses: cs-plus-plus/autograding-command-grader@v1
+        with:
+          test-name: hypotenuse 3 4 gives 5
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "hypotenuse 3 4 gives 5$"
+          timeout: 60
+          max-score: 10
+
+      - id: t_hyp512
+        name: hypotenuse 5 12 gives 13
+        uses: cs-plus-plus/autograding-command-grader@v1
+        with:
+          test-name: hypotenuse 5 12 gives 13
+          setup-command: echo "ready"
+          command: npx jest --runInBand --testNamePattern "hypotenuse 5 12 gives 13$"
+          timeout: 60
+          max-score: 10
+
       - id: t_sqrt
         name: uses Math sqrt
         uses: cs-plus-plus/autograding-command-grader@v1
@@ -139,45 +201,25 @@ jobs:
           timeout: 60
           max-score: 5
 
-      - id: t_initials2
-        name: getInitials two word name
+      - id: t_dist345
+        name: distance 0 0 to 3 4 gives 5
         uses: cs-plus-plus/autograding-command-grader@v1
         with:
-          test-name: getInitials two word name
+          test-name: distance 0 0 to 3 4 gives 5
           setup-command: echo "ready"
-          command: npx jest --runInBand --testNamePattern "getInitials two word name$"
-          timeout: 60
-          max-score: 20
-
-      - id: t_initials3
-        name: getInitials three word name
-        uses: cs-plus-plus/autograding-command-grader@v1
-        with:
-          test-name: getInitials three word name
-          setup-command: echo "ready"
-          command: npx jest --runInBand --testNamePattern "getInitials three word name$"
-          timeout: 60
-          max-score: 20
-
-      - id: t_hyp34
-        name: hypotenuse 3 4 gives 5
-        uses: cs-plus-plus/autograding-command-grader@v1
-        with:
-          test-name: hypotenuse 3 4 gives 5
-          setup-command: echo "ready"
-          command: npx jest --runInBand --testNamePattern "hypotenuse 3 4 gives 5$"
+          command: npx jest --runInBand --testNamePattern "distance 0 0 to 3 4 gives 5$"
           timeout: 60
           max-score: 15
 
-      - id: t_hyp512
-        name: hypotenuse 5 12 gives 13
+      - id: t_dist_neg
+        name: distance 2 -1 to -4 7 gives 10
         uses: cs-plus-plus/autograding-command-grader@v1
         with:
-          test-name: hypotenuse 5 12 gives 13
+          test-name: distance 2 -1 to -4 7 gives 10
           setup-command: echo "ready"
-          command: npx jest --runInBand --testNamePattern "hypotenuse 5 12 gives 13$"
+          command: npx jest --runInBand --testNamePattern "distance 2 -1 to -4 7 gives 10$"
           timeout: 60
-          max-score: 15
+          max-score: 10
 
       # Summary
       - name: Build summary
@@ -192,11 +234,13 @@ jobs:
           const tests = [
             { name: "titleCase hELLO to Hello", pts: 15 },
             { name: "uses a String method", pts: 10 },
+            { name: "getInitials two word name", pts: 15 },
+            { name: "getInitials lowercase name", pts: 10 },
+            { name: "hypotenuse 3 4 gives 5", pts: 10 },
+            { name: "hypotenuse 5 12 gives 13", pts: 10 },
             { name: "uses Math sqrt", pts: 5 },
-            { name: "getInitials two word name", pts: 20 },
-            { name: "getInitials three word name", pts: 20 },
-            { name: "hypotenuse 3 4 gives 5", pts: 15 },
-            { name: "hypotenuse 5 12 gives 13", pts: 15 },
+            { name: "distance 0 0 to 3 4 gives 5", pts: 15 },
+            { name: "distance 2 -1 to -4 7 gives 10", pts: 10 },
           ];
           let earned = 0;
           const lines = ["# Unit 8.2 Autograder Summary", ""];
@@ -214,16 +258,18 @@ jobs:
       - name: Prepare reporter env
         shell: bash
         run: |
-          echo "T_TITLE_RESULTS=${{ steps.t_title.outputs.result }}"               >> "$GITHUB_ENV"
+          echo "T_TITLE_RESULTS=${{ steps.t_title.outputs.result }}" >> "$GITHUB_ENV"
           echo "T_STRING_METHOD_RESULTS=${{ steps.t_string_method.outputs.result }}" >> "$GITHUB_ENV"
-          echo "T_SQRT_RESULTS=${{ steps.t_sqrt.outputs.result }}"                 >> "$GITHUB_ENV"
-          echo "T_INITIALS2_RESULTS=${{ steps.t_initials2.outputs.result }}"         >> "$GITHUB_ENV"
-          echo "T_INITIALS3_RESULTS=${{ steps.t_initials3.outputs.result }}"         >> "$GITHUB_ENV"
-          echo "T_HYP34_RESULTS=${{ steps.t_hyp34.outputs.result }}"               >> "$GITHUB_ENV"
-          echo "T_HYP512_RESULTS=${{ steps.t_hyp512.outputs.result }}"             >> "$GITHUB_ENV"
+          echo "T_INITIALS2_RESULTS=${{ steps.t_initials2.outputs.result }}" >> "$GITHUB_ENV"
+          echo "T_INITIALS_LOWER_RESULTS=${{ steps.t_initials_lower.outputs.result }}" >> "$GITHUB_ENV"
+          echo "T_HYP34_RESULTS=${{ steps.t_hyp34.outputs.result }}" >> "$GITHUB_ENV"
+          echo "T_HYP512_RESULTS=${{ steps.t_hyp512.outputs.result }}" >> "$GITHUB_ENV"
+          echo "T_SQRT_RESULTS=${{ steps.t_sqrt.outputs.result }}" >> "$GITHUB_ENV"
+          echo "T_DIST345_RESULTS=${{ steps.t_dist345.outputs.result }}" >> "$GITHUB_ENV"
+          echo "T_DIST_NEG_RESULTS=${{ steps.t_dist_neg.outputs.result }}" >> "$GITHUB_ENV"
 
       - name: Report grades
         uses: cs-plus-plus/autograding-grading-reporter@v1
         with:
-          runners: 't_title,t_string_method,t_sqrt,t_initials2,t_initials3,t_hyp34,t_hyp512'
+          runners: 't_title,t_string_method,t_initials2,t_initials_lower,t_hyp34,t_hyp512,t_sqrt,t_dist345,t_dist_neg'
           token: ${{ github.token }}

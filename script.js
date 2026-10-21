@@ -19,7 +19,7 @@ function titleCase() {
   //         Use .toUpperCase() to capitalize it.
 
   // STEP 3: Get the rest of the string and make it lowercase.
-  //         Use .slice(1) to get everything after the first letter.
+  //         Use .substring(1) to get everything after the first letter.
   //         Use .toLowerCase() to make it lowercase.
 
   // STEP 4: Concatenate the uppercase first letter + lowercase rest.
@@ -32,38 +32,30 @@ function titleCase() {
 
 
 // --- getInitials() ---
-// This function extracts initials from a full name.
+// This function extracts the initials from a first and last name.
 // "John Doe" → "J.D."
-// "Mary Jane Watson" → "M.J.W."
+// "ada lovelace" → "A.L."
 
 function getInitials() {
   // STEP 1: Use prompt() to ask "Enter your full name"
+  //         The user types a first name, one space, and a last name.
   //         Store the result in a variable using let.
 
   // STEP 2: Get the first initial.
   //         Use .charAt(0) to get the first character.
   //         Use .toUpperCase() to make it uppercase.
 
-  // STEP 3: Find the first space using .indexOf(" ")
+  // STEP 3: Find the space using .indexOf(" ")
   //         This tells you where the first name ends.
 
   // STEP 4: Get the second initial.
-  //         The letter after the first space is at position (spaceIndex + 1).
+  //         The letter after the space is at position (spaceIndex + 1).
   //         Use .charAt(spaceIndex + 1) and .toUpperCase()
 
-  // STEP 5: Check if there is a second space (for 3-word names).
-  //         Use .indexOf(" ", firstSpace + 1) — the second argument
-  //         tells indexOf where to START searching.
-  //         If it returns -1, there is no second space.
+  // STEP 5: Build the initials string with a period after EACH initial.
+  //         Example: "J" + "." + "D" + "." → "J.D."
 
-  // STEP 6: If there IS a second space, get the third initial
-  //         using .charAt(secondSpace + 1) and .toUpperCase()
-
-  // STEP 7: Build the initials string with dots between them.
-  //         2-word name: "J.D."
-  //         3-word name: "M.J.W."
-
-  // STEP 8: Use alert() to display the initials.
+  // STEP 6: Use alert() to display the initials.
 
 }
 
@@ -91,5 +83,34 @@ function hypotenuse() {
   //         "Hypotenuse: " followed by the number
   //         rounded to 2 decimal places using .toFixed(2)
   //         Example: sides 3 and 4 → "Hypotenuse: 5.00"
+
+}
+
+
+// --- distance() ---
+// This function calculates the distance between two points
+// (x1, y1) and (x2, y2) on a graph.
+// Formula: d = sqrt((x2 - x1)² + (y2 - y1)²)
+
+function distance() {
+  // STEP 1: Use prompt() four times, in this order:
+  //         "Enter x1", "Enter y1", "Enter x2", "Enter y2"
+  //         Store each result in a variable using let.
+
+  // STEP 2: Convert all four values to numbers using parseFloat().
+
+  // STEP 3: Find how far apart the points are in each direction:
+  //         dx = x2 - x1
+  //         dy = y2 - y1
+
+  // STEP 4: Calculate the distance using Math.sqrt() and Math.pow().
+  //         d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
+  //         You can also use dx ** 2 instead of Math.pow(dx, 2).
+
+  // STEP 5: Use alert() to display the result.
+  //         The alert must say exactly:
+  //         "Distance: " followed by the number
+  //         rounded to 2 decimal places using .toFixed(2)
+  //         Example: (0, 0) and (3, 4) → "Distance: 5.00"
 
 }
